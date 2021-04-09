@@ -4,7 +4,13 @@ const fs = require('fs');
 
 const presetFile = JSON.parse(fs.readFileSync('./preset.json', 'utf-8'));
 const URL = presetFile.URL;
-const SELLERS = presetFile.SELLERS;
+const SELLERS = (presetFile.SELLERS <= 0 
+                ? 1 
+                : (presetFile.SELLERS % 1 === 0 
+                    ? presetFile.SELLERS
+                    : Math.ceil(presetFile.SELLERS)
+                )
+            );
 
 const makeFolder = (dir) => {
     if(!fs.existsSync(dir)) {
