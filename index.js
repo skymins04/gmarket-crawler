@@ -2,8 +2,9 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 
-const URL = 'http://corners.gmarket.co.kr/BestSellers?viewType=C&largeCategoryCode=100000003';
-const SELLERS = 30;
+const presetFile = JSON.parse(fs.readFileSync('./preset.json', 'utf-8'));
+const URL = presetFile.URL;
+const SELLERS = presetFile.SELLERS;
 
 const makeFolder = (dir) => {
     if(!fs.existsSync(dir)) {
