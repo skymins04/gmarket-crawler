@@ -1,7 +1,7 @@
 {
   "name": "gmarket-crawler",
   "version": "1.0.0",
-  "description": "",
+  "description": "G마켓의 베스트 제품별 셀러 정보를 랭킹순으로 크롤링하는 툴입니다.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
