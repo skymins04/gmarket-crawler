@@ -5,6 +5,12 @@ const fs = require('fs');
 const URL = 'http://corners.gmarket.co.kr/BestSellers?viewType=C&largeCategoryCode=100000003';
 const SELLERS = 30;
 
+const makeFolder = (dir) => {
+    if(!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+};
+
 const getHtml = async (url_) => {
     try { return await axios.get(url_); }
     catch (err) { console.error(err); }
@@ -88,5 +94,6 @@ getHtml(URL).then(html => {
 })
 .then(seller_list => {
     const date = new Date().toString();
+    makeFolder('./data');
     fs.writeFileSync('./data/shoplab_'+date+'.json', JSON.stringify(seller_list,null,4));
 })
