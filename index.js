@@ -2,69 +2,91 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 
-const getHtml = async (url_) => {
-    try {
-        return await axios.get(url_);
-    } catch (err) {
-        console.error(err);
-    }
-};
-
 const URL = 'http://corners.gmarket.co.kr/BestSellers?viewType=C&largeCategoryCode=100000003';
-const RANK = 30;
+const SELLERS = 30;
+
+const getHtml = async (url_) => {
+    try { return await axios.get(url_); }
+    catch (err) { console.error(err); }
+};
 
 getHtml(URL).then(html => {
     let list = [];
     const $ = cheerio.load(html.data);
     const $bodyList = $('div.best-list ul li');
 
+    console.log('please waiting for crawling datas...');
+
     $bodyList.each(function(i, elem) {
-        list[i] = {
-            title: $(this).find('a.itemname').attr('href')
-        };
+        list[i] = $(elem).find('a.itemname').attr('href');
     });
+    console.log(list);
 
-    const data = list.filter(n => n.title);
-    return data;
+    return list.filter(n => n);
 })
-.then(async res => {
+.then(async urls => {
     let seller_list = [];
-    for(i = 0; i < RANK; i++) {
-        seller_list.push(await getHtml(res[i].title).then(async html => {
-            const $ = cheerio.load(html.data);
-            const rank = i+1;
-            const url = $('span.text__seller a').attr('href');
-            const res = await getHtml(url).then(html => {
-                const $ = cheerio.load(html.data);
-                const name = $('div.seller_info_box dl dd:nth-of-type(1)').text().trim();
-                const ceo = $('div.seller_info_box dl dd:nth-of-type(2)').text().trim();
-                const tel = $('div.seller_info_box dl dd:nth-of-type(3)').text().trim();
-                const worktime = $('div.seller_info_box dl dd:nth-of-type(4)').text().trim();
-                const fax = $('div.seller_info_box dl dd:nth-of-type(5)').text().trim();
-                const email = $('div.seller_info_box dl dd:nth-of-type(6) a').text().trim();
-                const businessnum = $('div.seller_info_box dl dd:nth-of-type(7)').text().trim();
-                const addr = $('div.seller_info_box dl dd:nth-of-type(8)').text().trim();
 
-                return {name, ceo, tel, worktime, fax, email, businessnum, addr}
+    for(i = 0; i < ((urls.length >= SELLERS) ? SELLERS : urls.length); i++) {
+        seller_list.push(await getHtml(urls[i]).then(async html => {
+
+            const $ = cheerio.load(html.data);
+            const url = $('span.text__seller a').attr('href');
+            const data = await getHtml(url).then(html => {
+
+                const $ = cheerio.load(html.data);
+                const $bodyList = $('div.seller_info_box dl').children();
+                let data = {
+                    name: NaN,
+                    ceo: NaN,
+                    tel: NaN,
+                    worktime: NaN,
+                    fax: NaN,
+                    email: NaN,
+                    addr: NaN
+                };
+
+                $bodyList.each(function(i, elem) {
+                    console.log($(elem).text().trim());
+                    switch($(elem).text().trim()) {
+                        case '상호':
+                            data.name = $(elem).next().text().trim(); break;
+                        case '대표자':
+                            data.ceo = $(elem).next().text().trim(); break;
+                        case '전화번호':
+                            data.tel = $(elem).next().text().trim(); break;
+                        case '응대시간':
+                            data.worktime = $(elem).next().text().trim(); break;
+                        case '팩스번호':
+                            data.fax = $(elem).next().text().trim(); break;
+                        case '이메일':
+                            data.email = $(elem).next().text().trim(); break;
+                        case '영업소재지':
+                            data.addr = $(elem).next().text().trim(); break;
+                        default: console.log('skip'); break;
+                    }
+                });
+
+                return data;
             });
 
             return {
-                rank: rank,
-                name: res.name,
+                rank: i + 1,
+                name: data.name,
                 url: url,
-                ceo: res.ceo,
-                tel: res.tel,
-                worktime: res.worktime,
-                fax: res.fax,
-                email: res.email,
-                businessnum: res.businessnum,
-                addr: res.addr
+                ceo: data.ceo,
+                tel: data.tel,
+                worktime: data.worktime,
+                fax: data.fax,
+                email: data.email,
+                addr: data.addr
             }
         }));
     }
+
     return seller_list;
 })
-.then(res => {
+.then(seller_list => {
     const date = new Date().toString();
-    fs.writeFileSync('./data/shoplab_'+date+'.json', JSON.stringify(res,null,4));
+    fs.writeFileSync('./data/shoplab_'+date+'.json', JSON.stringify(seller_list,null,4));
 })
