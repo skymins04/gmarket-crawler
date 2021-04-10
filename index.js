@@ -84,15 +84,15 @@ getHtml(URL).then(html => {
             });
 
             return {
-                rank: i + 1,
-                name: data.name,
-                url: url,
-                ceo: data.ceo,
-                tel: data.tel,
-                worktime: data.worktime,
-                fax: data.fax,
-                email: data.email,
-                addr: data.addr
+                '순위': i + 1,
+                '대표자명': data.name,
+                '온라인매장 주소': url,
+                '대표자명': data.ceo,
+                '전화번호': data.tel,
+                '응대가능시간': data.worktime,
+                '팩스번호': data.fax,
+                '이메일': data.email,
+                '소재지': data.addr
             }
         }));
     }
