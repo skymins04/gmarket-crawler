@@ -50,13 +50,13 @@ getHtml(URL).then(html => {
                 const $ = cheerio.load(html.data);
                 const $bodyList = $('div.seller_info_box dl').children();
                 let data = {
-                    name: NaN,
-                    ceo: NaN,
-                    tel: NaN,
-                    worktime: NaN,
-                    fax: NaN,
-                    email: NaN,
-                    addr: NaN
+                    name: '',
+                    ceo: '',
+                    tel: '',
+                    worktime: '',
+                    fax: '',
+                    email: '',
+                    addr: ''
                 };
 
                 $bodyList.each(function(i, elem) {
@@ -85,7 +85,7 @@ getHtml(URL).then(html => {
 
             return {
                 '순위': i + 1,
-                '대표자명': data.name,
+                '상호명': data.name,
                 '온라인매장 주소': url,
                 '대표자명': data.ceo,
                 '전화번호': data.tel,
