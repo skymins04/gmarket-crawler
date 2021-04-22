@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 
 const presetFile = JSON.parse(fs.readFileSync('./preset.json', 'utf-8'));
-const URL = presetFile.URL;
+const MODE = presetFile.MODE;
 const SELLERS = (presetFile.SELLERS <= 0 ?
     1 :
     (presetFile.SELLERS % 1 === 0 ?
@@ -12,6 +12,7 @@ const SELLERS = (presetFile.SELLERS <= 0 ?
     )
 );
 const ONLY_POWERDEALER = presetFile.ONLY_POWERDEALER;
+var URL = '';
 
 const makeFolder = (dir) => {
     if (!fs.existsSync(dir)) {
@@ -27,16 +28,39 @@ const getHtml = async (url_) => {
     }
 };
 
+if(MODE === 'default') {
+    throw 'default mode is not supported yet';
+}
+else if(MODE === 'best') {
+    URL += 'http://corners.gmarket.co.kr/Bestsellers?viewType=C';
+    if(presetFile.LARGE_CATEGORY_CODE) {
+        if(typeof presetFile.LARGE_CATEGORY_CODE !== 'string') throw 'LARGE_CATEGORY_CODE\'s datatype is not \'string\' in preset.json';
+        URL += `&largeCategoryCode=${presetFile.LARGE_CATEGORY_CODE}`;
+        if(presetFile.MEDIUM_CATEGORY_CODE) {
+            if(typeof presetFile.MEDIUM_CATEGORY_CODE !== 'string') throw 'MEDIUM_CATEGORY_CODE\'s datatype is not \'string\' in preset.json';
+            URL += `&mediumCategoryCode=${presetFile.MEDIUM_CATEGORY_CODE}`;
+            if(presetFile.SMALL_CATEGORY_CODE) {
+                if(typeof presetFile.SMALL_CATEGORY_CODE !== 'string') throw 'SMALL_CATEGORY_CODE\'s datatype is not \'string\' in preset.json';
+                URL += `&smallCategoryCode=${presetFile.SMALL_CATEGORY_CODE}`;
+            }
+        }
+    }
+    else throw 'can not found LARGE_CATEGORY_CODE in preset.json';
+}
+else throw 'MODE of preset.json is not vaild';
+
+if(!(SELLERS >= 0 && SELLERS <= 80 && SELLERS % 1 === 0 )) throw 'SELLERS of preset.json is not vaild.';
+if(typeof ONLY_POWERDEALER !== 'boolean') throw 'ONLY_POWERDEALER of preset.json is not vaild.';
+
+console.log(`crawling mode: ${MODE}`);
+console.log(`crawling sellers: ${SELLERS}`);
+console.log(`only powerdealer: ${ONLY_POWERDEALER}`);
+console.log(`crawling url: ${URL}`);
+
 getHtml(URL).then(html => {
         let list = [];
         const $ = cheerio.load(html.data);
         const $bodyList = $('div.best-list ul li');
-
-        if(!(SELLERS >= 0 && SELLERS <= 80 && SELLERS % 1 === 0 )) throw 'SELLERS of preset.json is not vaild.';
-        if(typeof ONLY_POWERDEALER !== 'boolean') throw 'ONLY_POWERDEALER of preset.json is not vaild.';
-
-        console.log(`crawling sellers: ${SELLERS}`);
-        console.log(`only powerdealer: ${ONLY_POWERDEALER}`);
 
         console.log('please waiting for crawling datas...');
 
@@ -53,8 +77,12 @@ getHtml(URL).then(html => {
 
         for (i = 0; i < ((urls.length >= SELLERS + ext_idx) ? SELLERS + ext_idx : urls.length); i++) {
             seller_list.push(await getHtml(urls[i]).then(async html => {
-
-                var shopinfo_req = await axios.default.post('http://item.gmarket.co.kr/Shop/ShopInfo', JSON.parse(html.data.substring(html.data.indexOf('var goods = ')+12, html.data.lastIndexOf('\"};')+2)));
+                console.log(`crawling ${i}: ${urls[i]}`);
+                fs.writeFileSync('./log/log.html', html.data);
+                
+                var substring_data = html.data.substring(html.data.indexOf('var goods = ')+12, html.data.length);
+                console.log(substring_data.substring(0, substring_data.indexOf(';')));
+                var shopinfo_req = await axios.default.post('http://item.gmarket.co.kr/Shop/ShopInfo', JSON.parse(substring_data.substring(0, substring_data.indexOf(';'))));
                 const $shopinfo = cheerio.load(shopinfo_req.data);
                 const $ = cheerio.load(html.data);
 

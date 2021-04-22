@@ -1,5 +1,7 @@
 {
-    "URL": "http://corners.gmarket.co.kr/BestSellers?viewType=C&largeCategoryCode=100000003",
+    "MODE": "best",
+    "LARGE_CATEGORY_CODE": "100000003",
+    "MEDIUM_CATEGORY_CODE": "200000498",
     "SELLERS": 50,
     "ONLY_POWERDEALER": true
 }
