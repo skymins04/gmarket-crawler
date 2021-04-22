@@ -1,7 +1,8 @@
 {
-    "MODE": "best",
-    "LARGE_CATEGORY_CODE": "100000003",
-    "MEDIUM_CATEGORY_CODE": "200000498",
-    "SELLERS": 50,
+    "MODE": "default",
+    "LARGE_CATEGORY_CODE": "200000498",
+    "SELLERS": 20,
+    "OUTPUTDIR": "./data",
+    "FILENAME": "/shoplab_gmarket티셔츠seller",
     "ONLY_POWERDEALER": true
 }
