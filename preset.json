@@ -1,8 +1,7 @@
 {
-    "MODE": "default",
-    "LARGE_CATEGORY_CODE": "200000507",
-    "SELLERS": 50,
-    "OUTPUTDIR": "./data/20210422",
+    "MODE": "best",
+    "LARGE_CATEGORY_CODE": "100000003",
+    "OUTDIR": "data/20210425/best",
     "FILENAME": "/shoplab_gmarketseller",
     "ONLY_POWERDEALER": true
 }
