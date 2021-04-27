@@ -6,6 +6,7 @@ G마켓의 베스트 제품별 셀러 정보를 랭킹순으로 크롤링하는 
 ```
     $ git clone https://github.com/skymins04/gmarket-crawler.git
     $ cd gmarket-crawler
+    $ npm install -g typescript
     $ npm install
 ```
 
@@ -14,11 +15,11 @@ G마켓의 베스트 제품별 셀러 정보를 랭킹순으로 크롤링하는 
 
     + MODE - 크롤링 모드를 설정함 (필수 필드, 타입: string)
         + "default": G마켓 기본 브라우징 제품 내에서 크롤링 
-        + "best": G마켓 베스트 제품 내에서 크롤링
+        + ~~"best": G마켓 베스트 제품 내에서 크롤링~~
 
-    + SELLERS - 크롤링하려는 셀러의 수 (필수 필드, 타입: number, MODE-best의 경우 범위: 0~80, MODE-default의 경우 범위: 0~무제한)
+    + DEALERS - 크롤링하려는 셀러의 수 (필수 필드, 타입: number, ~~MODE-best의 경우 범위: 0~80~~, MODE-default의 경우 범위: 0~무제한)
 
-    + OUTPUTDIR - 크롤링 데이터의 출력 위치 (필수 필드, 타입: string, 디렉토리 형태의 문자열)
+    + OUTDIR - 크롤링 데이터의 출력 위치 (필수 필드, 타입: string, 디렉토리 형태의 문자열)
 
     + FILENAME - 출력 데이터의 접두어 (필수 필드, 타입: string)
 
@@ -35,24 +36,25 @@ G마켓의 베스트 제품별 셀러 정보를 랭킹순으로 크롤링하는 
     {
         "MODE": "default",
         "LARGE_CATEGORY_CODE": (essential, type: string),
-        "SELLERS": (essential, type: number)
+        "DEALERS": (essential, type: number)
         "ONLY_POWERDEALER": (optional, type: boolean),
-        "OUTPUTDIR": "./data",
+        "OUTDIR": "data",
         "FILENAME": "crawling_data"
     }
 
 ```
 ```
     (preset.json, mode: best)
+    (현재 mode best는 임시적으로 지원하지 않음)
 
     {
         "MODE": "best",
         "LARGE_CATEGORY_CODE": (essential, type: string),
         "MEDIUM_CATEGORY_CODE" (optional, type: string),
         "SMALL_CATEGORY_CODE": (optional, type: string),
-        "SELLERS": (essential, type: number),
+        "DEALERS": (essential, type: number),
         "ONLY_POWERDEALER": (optional, type: boolean),
-        "OUTPUTDIR": "./data",
+        "OUTPUTDIR": "data",
         "FILENAME": "crawling_data"
     }
 
